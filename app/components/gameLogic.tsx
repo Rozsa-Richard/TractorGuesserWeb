@@ -1,29 +1,63 @@
 'use client'
-import { getVehicles } from "@/data/data";
+import { Hint } from "@/types/hint";
 import { Vehicle } from "@/types/vehicle";
 import Image from 'next/image';
 import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
-const GameLogic = () => {
+const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle, defaultTractors: Vehicle[] }) => {
     const [query, setQuery] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [filteredItems, setFilteredItems] = useState<Array<Vehicle>>([]);
-    const [tractors, setTractors] = useState<Array<Vehicle>>(getVehicles());
+    const [tractors, setTractors] = useState<Array<Vehicle>>(defaultTractors);
     const [guessed, setGuessed] = useState<Array<Vehicle>>([]);
+    const [hints, setHints] = useState<Array<Hint>>([]);
+    const [isOver, setIsOver] = useState<boolean>(false);
 
-    const handleSelect = (item: Vehicle) => {
+    const decision = (tractor: number, guess: number) => {
+        if (tractor == guess)
+            return "correct";
+        return tractor > guess ? "higher wrong" : "lower wrong";
+    }
+
+    const handleSelect = (guess: Vehicle) => {
         setQuery("");    
-        setGuessed([...guessed, item]);
-        setTractors(tractors.filter(i => i != item));
         setIsOpen(false);   
-  };
+
+        if (guess.id == todaysVehicle.id){
+            setHints([...hints, {
+                id: guess.id,
+                name: "correct",
+                power: "correct",
+                max_speed: "correct",
+                price: "correct",
+                brand: "correct",
+                category: "correct",
+                fuel_capacity: "correct",
+            } as Hint]);
+            setIsOver(true);
+        }
+        else {
+            setHints([...hints, {
+                id: guess.id,
+                name: todaysVehicle.name == guess.name ? "correct" : "wrong",
+                power: decision(todaysVehicle.power, guess.power),
+                max_speed: decision(todaysVehicle.max_speed, guess.max_speed),
+                price: decision(todaysVehicle.price, guess.price),
+                brand: todaysVehicle.brand == guess.brand ? "correct" : "wrong",
+                category: todaysVehicle.category == guess.category ? "correct" : "wrong",
+                fuel_capacity: decision(todaysVehicle.fuel_capacity, guess.fuel_capacity), 
+            } as Hint]);
+        }
+        setGuessed([...guessed, guess]);
+        setTractors(tractors.filter(i => i != guess));
+    };
 
     return (
-        <div className="m-auto col-10">
-            <div className="position-relative" style={{ width: '300px' }}>
+        <div className="m-auto col-lg-10 col-xl-8">
+            {!isOver ? <div className="position-relative" style={{ width: '300px' }}>
                 <label htmlFor="searchSelect" className="form-label fw-bold">
-                    Keresés a listában
+                    Take a guess!
                 </label>
                 
                 <input
@@ -80,32 +114,35 @@ const GameLogic = () => {
 
                 {isOpen && filteredItems.length === 0 && (
                     <ul className="list-group position-absolute w-100 mt-1 shadow-sm" style={{ zIndex: 1050 }}>
-                    <li className="list-group-item text-muted text-center">Nincs találat</li>
+                        <li className="list-group-item text-muted text-center">Not found</li>
                     </ul>
                 )}
-            </div>
+            </div> : <h3 className="text-center">Congratulation you guessed it!</h3>}
 
             <div>
-                <Row>
-                    <Col xs={2}>Brand</Col>
-                    <Col xs={2}>Name</Col>
-                    <Col xs={2}>Category</Col>
-                    <Col xs={2}>Horsepower</Col>
-                    <Col xs={2}>Max Speed</Col>
-                    <Col xs={2}>Fuel Capacity (l)</Col>
+                <Row className="text-center">
+                    <Col className="column">Brand</Col>
+                    <Col className="column">Name</Col>
+                    <Col className="column">Category</Col>
+                    <Col className="column">Horsepower</Col>
+                    <Col className="column">Max Speed</Col>
+                    <Col className="column">Price</Col>
+                    <Col className="column">Fuel Capacity (l)</Col> 
                 </Row>
-                {guessed.length > 0 ? (<>
-                    {guessed.map(t => (<Row key={t.id}>
-                        <Col xs={2}>{t.brand}</Col>
-                        <Col xs={2}>{t.name}</Col>
-                        <Col xs={2}>{t.category}</Col>
-                        <Col xs={2}>{t.power}</Col>
-                        <Col xs={2}>{t.max_speed}</Col>
-                        <Col xs={2}>{t.fuel_capacity}</Col>
-                    </Row>))}
-                </>) : (<div>
-
-                </div>)}
+                {guessed.length > 0 && (<>
+                    {[...guessed].reverse().map(t => {
+                        const hint = hints.find(a => a.id == t.id)!;
+                        return <Row key={t.id} className="mt-3">
+                                    <Col className="column"><div className={`infoBox ${hint.brand}`}>{t.brand}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.name}`}>{t.name}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.category}`}>{t.category}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.power}`}>{t.power}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.max_speed}`}>{t.max_speed}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.price}`}>{t.price}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.fuel_capacity}`}>{t.fuel_capacity}</div></Col>
+                                </Row>
+                    })}
+                </>)}
             </div>
         </div>
     )
