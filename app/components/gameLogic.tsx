@@ -1,11 +1,12 @@
 'use client'
+import { Brand } from "@/types/brand";
 import { Hint } from "@/types/hint";
 import { Vehicle } from "@/types/vehicle";
 import Image from 'next/image';
 import { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
-const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle, defaultTractors: Vehicle[] }) => {
+const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: Vehicle, defaultTractors: Vehicle[], brands: Brand[] }) => {
     const [query, setQuery] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [filteredItems, setFilteredItems] = useState<Array<Vehicle>>([]);
@@ -44,7 +45,7 @@ const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle,
                 power: decision(todaysVehicle.power, guess.power),
                 max_speed: decision(todaysVehicle.max_speed, guess.max_speed),
                 price: decision(todaysVehicle.price, guess.price),
-                brand: todaysVehicle.brand == guess.brand ? "correct" : "wrong",
+                brand: todaysVehicle.brandId == guess.brandId ? "correct" : "wrong",
                 category: todaysVehicle.category == guess.category ? "correct" : "wrong",
                 fuel_capacity: decision(todaysVehicle.fuel_capacity, guess.fuel_capacity), 
             } as Hint]);
@@ -70,7 +71,8 @@ const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle,
 
                         if (value.length >= 1) {
                             const filtered = tractors.filter((item) => {
-                                const str = item.brand +" "+ item.name;
+                                const brand = brands.find(b => b.id == item.brandId);
+                                const str = brand?.name +" "+ item.name;
                                 return str.toLowerCase().includes(value.toLowerCase())
                             });
                             setFilteredItems(filtered);
@@ -92,23 +94,25 @@ const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle,
                         zIndex: 1050 
                     }}
                     >
-                    {filteredItems.map((item, index) => (
-                        <li
-                        key={index}
-                        className="list-group-item list-group-item-action"
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleSelect(item)}
-                        >
-                            {item.image ? <Image
-                                src={item.image}
-                                alt=""
-                                width={50}
-                                height={50}
-                                className="rounded-circle" 
-                            /> : (<></>)}
-                            {item.name}
-                        </li>
-                    ))}
+                    {filteredItems.map((item, index) => {
+                        const brand = brands.find(b => b.id == item.brandId)?.name;
+                        return (
+                            <li
+                            key={index}
+                            className="list-group-item list-group-item-action"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleSelect(item)}
+                            >
+                                {item.image ? <Image
+                                    src={item.image}
+                                    alt=""
+                                    width={50}
+                                    height={50}
+                                    className="rounded-circle" 
+                                /> : (<></>)}
+                                {brand + " " +item.name}
+                            </li>
+                        )})}
                     </ul>
                 )}
 
@@ -133,7 +137,7 @@ const GameLogic = ({ todaysVehicle, defaultTractors }: { todaysVehicle: Vehicle,
                     {[...guessed].reverse().map(t => {
                         const hint = hints.find(a => a.id == t.id)!;
                         return <Row key={t.id} className="mt-3">
-                                    <Col className="column"><div className={`infoBox ${hint.brand}`}>{t.brand}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.brand}`}><Image src={`/brands/${brands.find(b => b.id == t.brandId)?.image}`} alt={"logo"} width={150} height={150} style={{ objectFit: "contain" }}/></div></Col>
                                     <Col className="column"><div className={`infoBox ${hint.name}`}>{t.name}</div></Col>
                                     <Col className="column"><div className={`infoBox ${hint.category}`}>{t.category}</div></Col>
                                     <Col className="column"><div className={`infoBox ${hint.power}`}>{t.power}</div></Col>

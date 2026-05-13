@@ -1,12 +1,11 @@
 # todos:
 
--pénznem váltása valamelyik sarokba, localstorage-ba mentsük
--egy nagy egy game
--random game page
--képek lementve
--brand logók is lementve
+-pénznem váltása valamelyik sarokba, localstorage-ba mentsük  
+-egy nap egy game  
+-random game page  
+-képek lementve  
 
 # messze
 
--hang alapján kitalálni
+-hang alapján kitalálni  
 -kép alapján kitalálni
