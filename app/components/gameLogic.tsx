@@ -1,55 +1,63 @@
 'use client'
-import { Brand } from "@/types/brand";
-import { Hint } from "@/types/hint";
-import { Vehicle } from "@/types/vehicle";
 import Image from 'next/image';
-import { useState } from "react";
+import { Brand } from "@/types/brand";
+import { Category } from "@/types/category";
+import { Vehicle } from "@/types/vehicle";
+import { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
-const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: Vehicle, defaultTractors: Vehicle[], brands: Brand[] }) => {
+
+const GameLogic = ({ todaysVehicle, defaultTractors, brands, date } : { todaysVehicle: Vehicle, defaultTractors: Vehicle[], brands: Brand[], date: string, }) => {
     const [query, setQuery] = useState<string>('');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [filteredItems, setFilteredItems] = useState<Array<Vehicle>>([]);
     const [tractors, setTractors] = useState<Array<Vehicle>>(defaultTractors);
     const [guessed, setGuessed] = useState<Array<Vehicle>>([]);
-    const [hints, setHints] = useState<Array<Hint>>([]);
     const [isOver, setIsOver] = useState<boolean>(false);
 
-    const decision = (tractor: number, guess: number) => {
+    const [loaded, setLoaded] = useState<boolean>(false);
+    const [measure, setMeasure] = useState<boolean>(false);
+    const [money, setMoney] = useState<string>("€");
+
+    useEffect(() => {
+        const lastDate = localStorage.getItem("lastDate");
+        if (lastDate == date) {
+            const tips = JSON.parse(localStorage.getItem("tips") ?? "[]");
+            if (tips){
+                setGuessed(defaultTractors.filter(t => tips.includes(t.id)));
+                setTractors(tractors.filter(t => !tips.includes(t.id)));
+                if (tips.includes(todaysVehicle.id))
+                    setIsOver(true);
+            }
+            setLoaded(true);
+        }
+        else 
+            localStorage.setItem("lastDate",date);
+    },[]);
+
+    useEffect(() => {
+        setMeasure((localStorage.getItem("measure") ?? "1") == "1");
+        setMoney(localStorage.getItem("money") ?? "€");
+    },[query]);
+
+    useEffect(() => {
+        if (loaded)
+            localStorage.setItem("tips",JSON.stringify(guessed.map(g => g.id)));
+    },[guessed]);
+
+    const higherOrLower = (tractor: number, guess: number) => {
         if (tractor == guess)
             return "correct";
-        return tractor > guess ? "higher wrong" : "lower wrong";
-    }
+        return tractor < guess ? "lower wrong" : "higher wrong";
+    };
+
+    const isItCorrect = (tractor: any, guess: any) => tractor == guess ? "correct" : "wrong";
 
     const handleSelect = (guess: Vehicle) => {
         setQuery("");    
         setIsOpen(false);   
-
-        if (guess.id == todaysVehicle.id){
-            setHints([...hints, {
-                id: guess.id,
-                name: "correct",
-                power: "correct",
-                max_speed: "correct",
-                price: "correct",
-                brand: "correct",
-                category: "correct",
-                fuel_capacity: "correct",
-            } as Hint]);
+        if (guess.id == todaysVehicle.id)
             setIsOver(true);
-        }
-        else {
-            setHints([...hints, {
-                id: guess.id,
-                name: todaysVehicle.name == guess.name ? "correct" : "wrong",
-                power: decision(todaysVehicle.power, guess.power),
-                max_speed: decision(todaysVehicle.max_speed, guess.max_speed),
-                price: decision(todaysVehicle.price, guess.price),
-                brand: todaysVehicle.brandId == guess.brandId ? "correct" : "wrong",
-                category: todaysVehicle.category == guess.category ? "correct" : "wrong",
-                fuel_capacity: decision(todaysVehicle.fuel_capacity, guess.fuel_capacity), 
-            } as Hint]);
-        }
         setGuessed([...guessed, guess]);
         setTractors(tractors.filter(i => i != guess));
     };
@@ -121,7 +129,10 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: 
                         <li className="list-group-item text-muted text-center">Not found</li>
                     </ul>
                 )}
-            </div> : <h3 className="text-center">Congratulation you guessed it!</h3>}
+            </div> : <div className='text-center'>
+                    <h3>Congratulation, you guessed it!</h3>
+                    Come back tomorow for the next puzzle
+                </div>}
 
             <div>
                 <Row className="text-center">
@@ -134,18 +145,15 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: 
                     <Col className="column">Fuel Capacity</Col> 
                 </Row>
                 {guessed.length > 0 && (<>
-                    {[...guessed].reverse().map(t => {
-                        const hint = hints.find(a => a.id == t.id)!;
-                        return <Row key={t.id} className="mt-3">
-                                    <Col className="column"><div className={`infoBox ${hint.brand}`}><Image src={`/brands/${brands.find(b => b.id == t.brandId)?.image}`} alt={"logo"} width={150} height={150} style={{ objectFit: "contain" }}/></div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.name}`}>{t.name}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.category}`}>{Category[t.category]}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.power}`}>{t.power}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.max_speed}`}>{measure ? (t.max_speed/8)*5 + " mp/h" : t.max_speed + "km/h"}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.price}`}>{t.price} {money}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.fuel_capacity}`}>{t.fuel_capacity} l</div></Col>
-                                </Row>
-                    })}
+                    {[...guessed].reverse().map(t => <Row key={t.id} className="mt-3">
+                                    <Col className="column"><div className={`infoBox ${isItCorrect(t.brandId,todaysVehicle.brandId)}`}><Image src={`/brands/${brands.find(b => b.id == t.brandId)?.image}`} alt={"logo"} width={150} height={150} style={{ objectFit: "contain" }}/></div></Col>
+                                    <Col className="column"><div className={`infoBox ${isItCorrect(t.name,todaysVehicle.name)}`}>{t.name}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${isItCorrect(t.category,todaysVehicle.category)}`}>{Category[t.category]}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${higherOrLower(t.power, todaysVehicle.power)}`}>{t.power}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${higherOrLower(t.max_speed,todaysVehicle.max_speed)}`}>{measure ? (t.max_speed/8)*5 + " mp/h" : t.max_speed + "km/h"}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${higherOrLower(t.price, todaysVehicle.price)}`}>{t.price} {money}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${higherOrLower(t.fuel_capacity, todaysVehicle.fuel_capacity)}`}>{t.fuel_capacity} l</div></Col>
+                                </Row>)}
                 </>)}
             </div>
         </div>
