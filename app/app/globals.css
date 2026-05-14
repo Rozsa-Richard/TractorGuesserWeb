@@ -21,14 +21,14 @@
 }
 
 .higher {
-  background-image: url("/arrow-up.png");
+  background-image: url("/arrow-down.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
 .lower {
-  background-image: url("/arrow-down.png");
+  background-image: url("/arrow-up.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

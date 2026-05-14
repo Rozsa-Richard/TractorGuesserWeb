@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 
 const Settings = () => {
   const options = ["€", "$", "£"];
@@ -17,6 +18,11 @@ const Settings = () => {
   const prev = () => setIndex((i) => (i === 0 ? options.length - 1 : i - 1));
   const next = () => setIndex((i) => (i === options.length - 1 ? 0 : i + 1));
 
+  const clearStorage = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   return (<>
     <div className="selector">
       <button onClick={prev}>◀</button>
@@ -27,6 +33,7 @@ const Settings = () => {
       <button type="button" className="btn btn-primary" onClick={() => setMeasure(false)}>km/h</button>
       <button type="button" className="btn btn-primary" onClick={() => setMeasure(true)}>mp/h</button>
     </div>
+    <Button onClick={clearStorage}>Clear local storage</Button>
   </>);
 }
 

@@ -1,8 +1,12 @@
 # todos:
 
--egy nap egy game  
 -random game page  
--képek lementve
+-képek lementve  
+-discord elérhetőség  
+-github link  
+-giant software elérhetőségek  
+-domain  
+-gyors váltás az optionsnálv
 
 # messze
 

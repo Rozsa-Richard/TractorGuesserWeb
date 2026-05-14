@@ -1,4 +1,5 @@
 import GameLogic from "@/components/gameLogic";
+import Settings from "@/components/settings";
 import { Brand } from "@/types/brand";
 import { Vehicle } from "@/types/vehicle";
 import { createClient } from "@/utils/supabase/server";
@@ -24,11 +25,13 @@ export default async function Home() {
   
   return (
     <main className="container pb-5">
+      <Settings/>
       <h1 className="text-center mt-5 mb-4 fw-bold">Tractor Guesser</h1>
       <GameLogic 
         todaysVehicle={result?.vehicles} 
         defaultTractors={vehicles as Vehicle[]}
         brands={brands as Brand[]}
+        date={todayISO}
       />
     </main>
   );
