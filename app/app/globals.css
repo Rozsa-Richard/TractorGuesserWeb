@@ -1,18 +1,16 @@
 .infoBox {
+  letter-spacing: 0.5px;
+
   padding: 0 !important;
   border: 1px solid black;
   max-width: 150px;
   aspect-ratio: 1 / 1;
   margin: auto;
-  color: white;
 
   display: flex;
   justify-content: center; 
   align-items: center; 
-  
-  font-weight: bold;
   text-align: center;
-
   overflow: hidden;
 }
 
@@ -56,9 +54,39 @@
 }
 
 body {
+  font-family: 'Montserrat', 'Oswald', 'Impact', sans-serif !important;
+  font-weight: 900; 
+  font-style: italic;
+  text-transform: uppercase;
+
   background-image: url("/background.jpg");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+@media (width <= 1400px) {
+  body {
+    background-image: url("/backgroundTablet.jpg");
+  }
+}
+
+@media (width <= 800px) {
+  body {
+    background-image: url("/backgroundMobile.png");
+  }
+  .column {
+    margin: 0px;
+  }
+}
+
+h1 {
+  font-size: 4rem;
+  text-shadow: 
+    3px 3px 0px #ffffff85,
+   -1px -1px 0px #ffffff85,  
+    1px -1px 0px #ffffff85,
+   -1px  1px 0px #ffffff85,
+    1px  1px 0px #ffffff85;
 }

@@ -5,7 +5,7 @@ export type Vehicle = {
     max_speed: number;
     price: number;
     brandId: number;
-    category: string;
+    category: number;
     fuel_capacity: number;
     image: string;
 };

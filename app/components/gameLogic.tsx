@@ -131,7 +131,7 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: 
                     <Col className="column">Horsepower</Col>
                     <Col className="column">Max Speed</Col>
                     <Col className="column">Price</Col>
-                    <Col className="column">Fuel Capacity (l)</Col> 
+                    <Col className="column">Fuel Capacity</Col> 
                 </Row>
                 {guessed.length > 0 && (<>
                     {[...guessed].reverse().map(t => {
@@ -139,11 +139,11 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands }: { todaysVehicle: 
                         return <Row key={t.id} className="mt-3">
                                     <Col className="column"><div className={`infoBox ${hint.brand}`}><Image src={`/brands/${brands.find(b => b.id == t.brandId)?.image}`} alt={"logo"} width={150} height={150} style={{ objectFit: "contain" }}/></div></Col>
                                     <Col className="column"><div className={`infoBox ${hint.name}`}>{t.name}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.category}`}>{t.category}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.category}`}>{Category[t.category]}</div></Col>
                                     <Col className="column"><div className={`infoBox ${hint.power}`}>{t.power}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.max_speed}`}>{t.max_speed}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.price}`}>{t.price}</div></Col>
-                                    <Col className="column"><div className={`infoBox ${hint.fuel_capacity}`}>{t.fuel_capacity}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.max_speed}`}>{measure ? (t.max_speed/8)*5 + " mp/h" : t.max_speed + "km/h"}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.price}`}>{t.price} {money}</div></Col>
+                                    <Col className="column"><div className={`infoBox ${hint.fuel_capacity}`}>{t.fuel_capacity} l</div></Col>
                                 </Row>
                     })}
                 </>)}
