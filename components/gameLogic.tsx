@@ -112,7 +112,7 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands, date } : { todaysVe
                             onClick={() => handleSelect(item)}
                             >
                                 {item.image ? <Image
-                                    src={item.image}
+                                    src={`/tractors/${item.image}.png`}
                                     alt=""
                                     width={50}
                                     height={50}
