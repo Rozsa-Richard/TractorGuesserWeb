@@ -111,13 +111,12 @@ const GameLogic = ({ todaysVehicle, defaultTractors, brands, date } : { todaysVe
                             style={{ cursor: 'pointer' }}
                             onClick={() => handleSelect(item)}
                             >
-                                {item.image ? <Image
+                                {item.image && <Image
                                     src={`/tractors/${item.image}.png`}
                                     alt=""
                                     width={50}
                                     height={50}
-                                    className="rounded-circle" 
-                                /> : (<></>)}
+                                />}
                                 {brand + " " +item.name}
                             </li>
                         )})}
