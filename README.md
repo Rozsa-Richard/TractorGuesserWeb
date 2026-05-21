@@ -10,6 +10,8 @@
 -not found page  
 -layout description
 -counter a holnapiig kitalálás után
+-how to play
+-libary
 
 # messze
 
